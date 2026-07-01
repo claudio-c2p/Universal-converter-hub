@@ -1,0 +1,209 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html { scroll-behavior: smooth; }
+html, body { font-family: 'Inter', 'Segoe UI', sans-serif; }
+* { -webkit-tap-highlight-color: transparent; }
+
+/* ───────── Sistema de 3 temas: claro / escuro / chuva ───────── */
+:root {
+  --bg-page: #F8F8F8;
+  --bg-header: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-input: #F8F8F8;
+  --bg-pill: #FFFFFF;
+  --border-color: #E5E5E5;
+  --text-primary: #111111;
+  --text-secondary: #6B6B6B;
+  --particle-color: 17, 17, 17; /* rgb, faísca preta no modo claro */
+  --particle-size-min: 3px;
+  --particle-size-max: 6px;
+}
+
+html.dark {
+  --bg-page: #0A0A0A;
+  --bg-header: #111111;
+  --bg-card: #111111;
+  --bg-input: #111111;
+  --bg-pill: #111111;
+  --border-color: #1F2937;
+  --text-primary: #F3F4F6;
+  --text-secondary: #9CA3AF;
+  --particle-color: 232, 78, 27; /* laranja da marca no modo escuro */
+}
+
+html[data-theme='rain'] {
+  --bg-page: #131B2E;
+  --bg-header: #18223A;
+  --bg-card: #18223A;
+  --bg-input: #18223A;
+  --bg-pill: #1B2640;
+  --border-color: #2E3B57;
+  --text-primary: #E8ECF5;
+  --text-secondary: #8C9AB8;
+}
+
+html[data-theme='rain'] body {
+  background: radial-gradient(ellipse at top, #1A2540 0%, #0D1422 70%);
+}
+
+/* Brilho radial suave no topo do hero, atrás do badge — como nas referências */
+.hero-glow {
+  position: absolute;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 320px;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(ellipse at center, rgba(232, 78, 27, 0.16) 0%, rgba(232, 78, 27, 0) 70%);
+}
+html[data-theme='rain'] .hero-glow {
+  background: radial-gradient(ellipse at center, rgba(232, 78, 27, 0.12) 0%, rgba(56, 120, 221, 0.07) 55%, rgba(56, 120, 221, 0) 75%);
+}
+
+/* Partículas (faíscas) usadas nos modos claro e escuro */
+.particle-layer { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.particle {
+  position: absolute;
+  bottom: -10px;
+  width: var(--particle-w, 4px);
+  height: var(--particle-w, 4px);
+  border-radius: 999px;
+  background: rgba(var(--particle-color), 0.55);
+  box-shadow: 0 0 6px 1px rgba(var(--particle-color), 0.35);
+  animation-name: particle-rise;
+  animation-timing-function: ease-in;
+  animation-iteration-count: infinite;
+}
+@keyframes particle-rise {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  10%  { opacity: var(--particle-opacity, 0.3); }
+  90%  { opacity: var(--particle-opacity, 0.3); }
+  100% { transform: translateY(-110vh) translateX(var(--drift, 10px)); opacity: 0; }
+}
+
+/* Estrelas fixas cintilantes usadas no modo escuro (lua) */
+.star {
+  position: absolute;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 0 4px 1px rgba(255, 255, 255, 0.5);
+  animation-name: star-twinkle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+.star.amber {
+  background: rgba(232, 140, 70, 1);
+  box-shadow: 0 0 5px 1.5px rgba(232, 140, 70, 0.6);
+}
+@keyframes star-twinkle {
+  0%   { opacity: var(--star-min, 0.1); transform: scale(0.6); }
+  45%  { opacity: var(--star-min, 0.1); transform: scale(0.6); }
+  50%  { opacity: 1; transform: scale(1.6); }
+  55%  { opacity: var(--star-max, 0.85); transform: scale(1); }
+  100% { opacity: var(--star-min, 0.1); transform: scale(0.6); }
+}
+
+/* Cometas/estrelas cadentes cruzando o céu no modo escuro (lua) */
+.comet {
+  position: absolute;
+  top: -5%;
+  display: flex;
+  align-items: center;
+  animation-name: comet-fall;
+  animation-timing-function: ease-in;
+  animation-iteration-count: infinite;
+  transform-origin: left center;
+}
+.comet-tail {
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(to left,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 225, 190, 0.9) 18%,
+    rgba(255, 180, 120, 0.55) 45%,
+    rgba(232, 89, 12, 0.18) 75%,
+    rgba(232, 89, 12, 0) 100%);
+}
+.comet-head {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 12px 3px rgba(255, 235, 210, 0.9), 0 0 22px 7px rgba(255, 180, 110, 0.45);
+  margin-left: -2px;
+  flex-shrink: 0;
+}
+@keyframes comet-fall {
+  0%   { transform: translate(0, 0) rotate(35deg); opacity: 0; }
+  5%   { opacity: 1; }
+  26%  { opacity: 1; }
+  38%  { transform: translate(var(--comet-x, 60vw), var(--comet-y, 55vh)) rotate(35deg); opacity: 0; }
+  100% { transform: translate(var(--comet-x, 60vw), var(--comet-y, 55vh)) rotate(35deg); opacity: 0; }
+}
+
+/* Gotas de chuva usadas no modo chuva */
+.raindrop {
+  position: absolute;
+  top: -40px;
+  width: 2px;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, rgba(150, 190, 255, 0), rgba(170, 205, 255, 0.85));
+  animation-name: raindrop-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes raindrop-fall {
+  0%   { transform: translateY(-5vh) translateX(0); opacity: 0; }
+  8%   { opacity: 0.85; }
+  100% { transform: translateY(110vh) translateX(var(--drift, 6px)); opacity: 0.3; }
+}
+
+/* Faíscas extras (modo claro/sol) — pequenas centelhas que piscam ao subir */
+.spark {
+  position: absolute;
+  bottom: -10px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255, 170, 60, 0.95) 0%, rgba(232, 78, 27, 0.7) 60%, rgba(232, 78, 27, 0) 100%);
+  box-shadow: 0 0 8px 2px rgba(255, 150, 50, 0.55);
+  animation-name: spark-float;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+@keyframes spark-float {
+  0%   { transform: translateY(0) translateX(0) scale(0.6); opacity: 0; }
+  15%  { opacity: 1; }
+  50%  { transform: translateY(-55vh) translateX(var(--drift, 20px)) scale(1.1); opacity: 0.9; }
+  85%  { opacity: 0.4; }
+  100% { transform: translateY(-105vh) translateX(calc(var(--drift, 20px) * 1.6)) scale(0.4); opacity: 0; }
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #E5E5E5; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #E84E1B; }
+.dark ::-webkit-scrollbar-thumb { background: #2A2A2A; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #E84E1B; }
+
+::selection { background: #E84E1B; color: #fff; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+*, *::before, *::after {
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
+button, a {
+  transition-property: background-color, border-color, color, box-shadow, opacity, transform;
+}

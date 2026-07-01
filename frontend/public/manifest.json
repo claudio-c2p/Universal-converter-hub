@@ -1,0 +1,13 @@
+{
+  "name": "C2P — Universal Converter Hub",
+  "short_name": "C2P",
+  "description": "Mais de 50 conversores de arquivos gratuitos: PDF, Word, Excel, JSON, XML, legendas, geodados, fontes e muito mais.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F8F8F8",
+  "theme_color": "#111111",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
