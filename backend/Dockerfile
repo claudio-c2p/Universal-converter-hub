@@ -1,4 +1,4 @@
-FROM node:18-slim
+FROM node:22-slim
 
 # Binários de sistema exigidos pelas ferramentas implementadas e TESTADAS DE PONTA A PONTA:
 # - qpdf:        remover senha de PDF de verdade (pdf-remove-password)
