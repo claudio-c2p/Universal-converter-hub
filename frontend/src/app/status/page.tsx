@@ -8,10 +8,24 @@ interface BinaryStatus {
   available: boolean;
 }
 
+interface AutoUpdateStatus {
+  status: 'ok' | 'up-to-date' | 'failed' | 'unknown';
+  message: string;
+  checkedAt: string | null;
+}
+
+const AUTO_UPDATE_STYLES: Record<AutoUpdateStatus['status'], { dot: string; text: string; emoji: string }> = {
+  ok:          { dot: 'bg-green-500',  text: 'text-green-600 dark:text-green-400',  emoji: '✔️' },
+  'up-to-date':{ dot: 'bg-green-500',  text: 'text-green-600 dark:text-green-400',  emoji: '✔️' },
+  failed:      { dot: 'bg-red-500',    text: 'text-red-600 dark:text-red-400',      emoji: '❌' },
+  unknown:     { dot: 'bg-gray-400',   text: 'text-gray-500 dark:text-gray-400',    emoji: 'ℹ️' },
+};
+
 export default function StatusPage() {
   const [data, setData] = useState<BinaryStatus[] | null>(null);
   const [error, setError] = useState('');
   const [checkedAt, setCheckedAt] = useState('');
+  const [autoUpdate, setAutoUpdate] = useState<AutoUpdateStatus | null>(null);
   const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? '';
 
   useEffect(() => {
@@ -25,6 +39,11 @@ export default function StatusPage() {
         setCheckedAt(json.checkedAt);
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Erro desconhecido.'));
+
+    fetch(`${baseUrl}/api/health/auto-update`)
+      .then((res) => res.json())
+      .then(setAutoUpdate)
+      .catch(() => setAutoUpdate(null));
   }, [baseUrl]);
 
   return (
@@ -38,6 +57,24 @@ export default function StatusPage() {
           Disponibilidade das ferramentas externas usadas em algumas conversões. Se algo aparecer
           como indisponível, as ferramentas dessa categoria podem falhar temporariamente.
         </p>
+
+        {autoUpdate && (
+          <div className="mt-6 rounded-xl border border-brand-border dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-gray-800 dark:text-gray-200">Atualização automática do servidor</span>
+              <span className={`flex items-center gap-2 text-xs font-medium ${AUTO_UPDATE_STYLES[autoUpdate.status].text}`}>
+                <span className={`w-2 h-2 rounded-full ${AUTO_UPDATE_STYLES[autoUpdate.status].dot}`} />
+                {AUTO_UPDATE_STYLES[autoUpdate.status].emoji} {autoUpdate.status === 'unknown' ? 'Não configurado' : autoUpdate.status === 'failed' ? 'Falhou' : 'OK'}
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-brand-muted dark:text-gray-500">{autoUpdate.message}</p>
+            {autoUpdate.checkedAt && (
+              <p className="mt-1 text-xs text-gray-400">
+                Última verificação: {new Date(autoUpdate.checkedAt).toLocaleString('pt-BR')} (a cada 30 min)
+              </p>
+            )}
+          </div>
+        )}
 
         {error && (
           <p role="alert" className="mt-6 text-sm text-red-600 dark:text-red-400">{error}</p>

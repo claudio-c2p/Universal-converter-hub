@@ -13,6 +13,9 @@ const CATEGORY_COLORS: Record<string, string> = {
   OCR:        'bg-cyan-50 text-cyan-700 dark:bg-cyan-900/20 dark:text-cyan-400',
   IA:         'bg-violet-50 text-violet-700 dark:bg-violet-900/20 dark:text-violet-400',
   Config:     'bg-slate-50 text-slate-700 dark:bg-slate-900/20 dark:text-slate-400',
+  Imagem:     'bg-fuchsia-50 text-fuchsia-700 dark:bg-fuchsia-900/20 dark:text-fuchsia-400',
+  'Áudio e Vídeo': 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400',
+  Texto:      'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400',
 };
 
 export default function CategoryBadge({ category, className = '' }: { category: string; className?: string }) {

@@ -43,6 +43,16 @@ export default function MoreMenu() {
       href: '/sobre',
     },
     {
+      label: 'Documentação da API',
+      icon: <Icon d="M10 20l4-16M6 16l-4-4 4-4M18 8l4 4-4 4" />,
+      href: '/tools/api-docs',
+    },
+    {
+      label: 'Status do sistema',
+      icon: <Icon d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />,
+      href: '/status',
+    },
+    {
       label: 'Privacidade e segurança',
       icon: <Icon d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 10-8 0v4h8z" />,
       href: '/privacidade',

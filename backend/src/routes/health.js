@@ -1,7 +1,14 @@
 import express from 'express';
 import { execFile } from 'node:child_process';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const router = express.Router();
+
+// deploy/status.json fica na raiz do repo, dois níveis acima de src/routes/
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const STATUS_FILE = path.resolve(__dirname, '../../../deploy/status.json');
 
 // Cada entrada: nome amigável + comando + arg que tenta um retorno rápido
 // (geralmente --version). Alguns binários (ex: mdb-tables) não têm uma flag
@@ -55,6 +62,19 @@ router.get('/binaries', async (_req, res) => {
     // formato simples { libreoffice: true, calibre: false, ... } pedido na spec
     ...summary,
   });
+});
+
+// Lê o status escrito por deploy/server-auto-update.sh (roda a cada 30 min
+// via cron no servidor). Se o arquivo não existe ainda — servidor sem o cron
+// configurado, ou primeira execução ainda não rodou — retorna um estado neutro
+// em vez de erro, pra não quebrar a página de status por causa disso.
+router.get('/auto-update', async (_req, res) => {
+  try {
+    const raw = await fs.readFile(STATUS_FILE, 'utf-8');
+    res.json(JSON.parse(raw));
+  } catch {
+    res.json({ status: 'unknown', message: 'Auto-update ainda não configurado ou nunca rodou neste servidor.', checkedAt: null });
+  }
 });
 
 export default router;

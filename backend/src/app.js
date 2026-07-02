@@ -40,6 +40,26 @@ import libreOfficeRouter     from './routes/libreOffice.js';
 import extraBinaryRouter     from './routes/extraBinary.js';
 import healthRouter          from './routes/health.js';
 
+// ── Anexo v3 (1/3): Imagem, cadeia de conversão e e-mail ──
+import imageRouter        from './routes/image.js';
+import formatsGraphRouter from './routes/formatsGraph.js';
+import chainRouter        from './routes/chain.js';
+import filesRouter        from './routes/files.js';
+import emailRouter        from './routes/email.js';
+
+// ── Anexo v3 (2/3): imagem extra (PSD/ICO/HEIC) + HTML→PDF, PDF avançado,
+// áudio/vídeo (ffmpeg, async) e reforço Dados/Dev ──
+import imageExtraRouter   from './routes/imageExtra.js';
+import pdfAdvancedRouter  from './routes/pdfAdvanced.js';
+import audioVideoRouter   from './routes/audioVideo.js';
+import dataToolsRouter    from './routes/dataTools.js';
+
+// ── Anexo v3 (3/3): API keys ──
+import apiKeysRouter      from './routes/apiKeys.js';
+
+// Conversão em lote: 2+ arquivos, tipos mistos, todos para o mesmo formato de destino
+import batchConvertRouter from './routes/batch.js';
+
 const app = express();
 
 // Segurança
@@ -55,6 +75,7 @@ app.use(express.json({ limit: '1mb' }));
 const lightLimiter  = rateLimit({ windowMs: 60_000, max: 30 });
 const mediumLimiter = rateLimit({ windowMs: 60_000, max: 15 });
 const heavyLimiter  = rateLimit({ windowMs: 60_000, max: 10 });
+const emailLimiter  = rateLimit({ windowMs: 60 * 60_000, max: 5 }); // 5/hora por IP
 
 // Leves (texto puro)
 app.use('/api/subtitle',     lightLimiter);
@@ -73,6 +94,7 @@ app.use('/api/split-merge',  mediumLimiter);
 app.use('/api/exif',         mediumLimiter);
 app.use('/api/docx',         mediumLimiter);
 app.use('/api/office',       mediumLimiter);
+app.use('/api/image',        mediumLimiter); // sharp é leve → mediumLimiter, não heavyLimiter
 
 // Pesados (processamento intensivo)
 app.use('/api/font',         heavyLimiter);
@@ -82,6 +104,23 @@ app.use('/api/pdf-convert',  heavyLimiter);
 app.use('/api/binary-tools', heavyLimiter);
 app.use('/api/libreoffice',  heavyLimiter);
 app.use('/api/extra',        heavyLimiter);
+app.use('/api/chain-convert', heavyLimiter); // cada passo pode chamar soffice/sharp
+app.use('/api/batch',        heavyLimiter); // vários arquivos, cada um pode passar pelo LibreOffice
+
+// Formatos disponíveis para a cadeia (leitura simples)
+app.use('/api/formats-graph', lightLimiter);
+
+// E-mail — limite estrito específico (5/hora)
+app.use('/api/send-email',   emailLimiter);
+
+// Anexo v3 (2/3)
+app.use('/api/image-extra',   mediumLimiter); // psd/ico/heic — sharp/libs leves
+app.use('/api/pdf-advanced',  heavyLimiter);  // pdf-lib + puppeteer (html-to-pdf) + pdf-parse
+app.use('/api/audio-video',   heavyLimiter);  // ffmpeg
+app.use('/api/data-tools',    lightLimiter);  // sql.js roda em memória, é leve
+
+// Anexo v3 (3/3)
+app.use('/api/api-keys',      lightLimiter);
 
 // ── Registrar rotas ──
 app.use('/api/subtitle',     subtitleRouter);
@@ -108,6 +147,25 @@ app.use('/api/binary-tools', binaryToolsRouter);
 app.use('/api/libreoffice',  libreOfficeRouter);
 app.use('/api/extra',        extraBinaryRouter);
 app.use('/api/health',       healthRouter);
+
+// Anexo v3 (1/3)
+app.use('/api/image',         imageRouter);
+app.use('/api/formats-graph', formatsGraphRouter);
+app.use('/api', chainRouter);          // expõe POST /api/chain-convert
+app.use('/api/files',         filesRouter); // expõe GET /api/files/temp/:filename
+app.use('/api', emailRouter);          // expõe POST /api/send-email
+
+// Anexo v3 (2/3)
+app.use('/api/image-extra',   imageExtraRouter);
+app.use('/api/pdf-advanced',  pdfAdvancedRouter);
+app.use('/api/audio-video',   audioVideoRouter);
+app.use('/api/data-tools',    dataToolsRouter);
+
+// Anexo v3 (3/3)
+app.use('/api/api-keys',      apiKeysRouter);
+
+// Conversão em lote (multi-arquivo, tipos mistos)
+app.use('/api/batch',         batchConvertRouter);
 
 // Health check
 app.get('/', (_req, res) => {

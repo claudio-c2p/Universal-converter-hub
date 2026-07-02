@@ -20,5 +20,6 @@ out/
 .vscode/
 .idea/
 
-.vercel
-.env*
+# Auto-update (deploy/): estado de runtime, não deve ir pro git
+deploy/status.json
+deploy/logs/

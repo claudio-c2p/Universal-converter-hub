@@ -10,7 +10,7 @@
     "dev": "node --watch src/app.js"
   },
   "engines": {
-    "node": "22.x"
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",
@@ -45,6 +45,12 @@
     "tokml": "^0.4.0",
     "turndown": "^7.2.0",
     "vcf": "^2.1.2",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "puppeteer": "^23.9.0",
+    "ag-psd": "^25.1.2",
+    "png-to-ico": "^2.1.8",
+    "ico-endec": "^0.1.6",
+    "heic-convert": "^2.1.0",
+    "pdf-parse": "^1.1.1"
   }
 }
